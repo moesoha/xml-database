@@ -38,18 +38,13 @@ class XmlDatabase {
 	}
 
 	private function storeGetContent(string $name, string $type) {
-		$filename = "{$this->databaseName}+$name";
-		$this->store->acquireReadLock($filename, $type);
-		$content = $this->store->getContent($filename, $type);
-		$this->store->releaseReadLock($filename, $type);
-		return $content;
+		$filename = "{$this->databaseName}.$name.$type";
+		return $this->store->getContent($filename);
 	}
 
 	private function storeSetContent(string $name, string $type, string $content) {
-		$filename = "{$this->databaseName}+$name";
-		$this->store->acquireWriteLock($filename, $type);
-		$this->store->setContent($filename, $type, $content);
-		$this->store->releaseWriteLock($filename, $type);
+		$filename = "{$this->databaseName}.$name.$type";
+		$this->store->setContent($filename, $content);
 	}
 
 	public function loadXmlDocument(string $name): DOMDocument {
