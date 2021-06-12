@@ -10,13 +10,21 @@ use SohaJin\Course202001\XmlDatabaseProgram\Entity\Task;
 $db = (new XmlDatabase('todo', new FileStore(__DIR__.'/var/', 't_')))
 	->addEntityClass(Task::class);
 
-$test = (new Task())->setId(1)->setName('test!');
-$db->getEntityManager()->update((new Task())->setId(2)->setName('test 2!'));
-$db->getEntityManager()->update((new Task())->setId(3)->setName('test 3!'));
-$db->getEntityManager()->update((new Task())->setId(4)->setName('test 4!'));
-$db->getEntityManager()->update((new Task())->setId(5)->setName('test 5!'));
-$db->getEntityManager()->update((new Task())->setId(6)->setName('text 6!'));
+echo "--find by primary key--".PHP_EOL;
+var_dump(
+	$db->getEntityManager()
+		->createQueryBuilder(Task::class)
+		->findByPrimaryKey(114514)
+		->getSingleResult()
+);
 
+$test = (new Task(114514))->setName('current time')->setTime(time());
+$db->getEntityManager()->update((new Task(1))->setName('test 1!'));
+$db->getEntityManager()->update((new Task(2))->setName('test 2!'));
+$db->getEntityManager()->update((new Task(3))->setName('test 3!'));
+$db->getEntityManager()->update((new Task(4))->setName('test 4!'));
+$db->getEntityManager()->update((new Task(5))->setName('test 5!'));
+$db->getEntityManager()->update((new Task(6))->setName('text 6!'));
 $db->getEntityManager()->update($test);
 $db->getEntityManager()->persist();
 
@@ -24,7 +32,7 @@ echo "--find by primary key--".PHP_EOL;
 var_dump(
 	$db->getEntityManager()
 		->createQueryBuilder(Task::class)
-		->findByPrimaryKey(1)
+		->findByPrimaryKey(114514)
 		->getSingleResult()
 );
 

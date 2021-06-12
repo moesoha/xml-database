@@ -57,6 +57,9 @@ class EntityDocument {
 			$root->appendChild($o = $dom->createElement('xs:element'));
 			$o->setAttribute('name', $property->getName());
 			$o->setAttribute('type', DataType::convertFromPhpType($property->getType()));
+			if (substr((string)$property->getType(), 0, 1) === '?') {
+				$o->setAttribute('minOccurs', 0);
+			}
 		}
 		// primary key
 		$docRoot->appendChild($root = $dom->createElement('xs:unique'));
@@ -75,6 +78,9 @@ class EntityDocument {
 		$el = $dom->createElement(Helpers::convertPhpQualifiedNameToXmlElementName($this->getClassName()));
 		foreach($this->reflection->getFields() as $property) {
 			$property->setAccessible(true);
+			if (!$property->isInitialized($object)) {
+				continue;
+			}
 			$el->appendChild($dom->createElement($property->getName(), $property->getValue($object)));
 		}
 		return $el;
@@ -101,18 +107,26 @@ class EntityDocument {
 	}
 
 	public function parseXmlElement(DOMElement $el): object {
-		$object = $this->reflection->getClass()->newInstance();
+		$object = $this->reflection->getClass()->newInstanceWithoutConstructor();
 		if ($el->nodeName !== Helpers::convertPhpQualifiedNameToXmlElementName($this->getClassName())) {
 			throw new \InvalidArgumentException("Unexpected node name {$el->nodeName}");
 		}
 		foreach($this->reflection->getFields() as $property) {
 			$e = $el->getElementsByTagName($property->getName());
-			if ($e->count() > 1) {
+			$elCount = $e->count();
+			if ($elCount > 1) {
 				throw new \RuntimeException('Multiple '.$property->getName().' found');
-			} else if ($e->count() === 1) {
-				$value = $e->item(0)->nodeValue;
-				settype($value, (string)$property->getType());
+			} else {
+				$type = (string)$property->getType();
+				if ($elCount === 0 && (substr($type, 0, 1) !== '?')) {
+					continue;
+				}
 				$property->setAccessible(true);
+				$value = null;
+				if ($elCount === 1) {
+					$value = $e->item(0)->nodeValue;
+					settype($value, ltrim($type, '?'));
+				}
 				$property->setValue($object, $value);
 			}
 		}

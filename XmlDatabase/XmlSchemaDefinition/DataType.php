@@ -13,9 +13,10 @@ class DataType {
 		'string' => self::String
 	];
 	public static function convertFromPhpType(\ReflectionType $type) {
-		if (!isset(self::$PhpTypeMap[(string)$type])) {
-			throw new \RuntimeException('Unknown '.$type.', cannot to be convert to XSD type.');
+		$typeName = ltrim((string)$type, '?');
+		if (!isset(self::$PhpTypeMap[$typeName])) {
+			throw new \RuntimeException('Unknown '.$typeName.', cannot to be convert to XSD type.');
 		}
-		return self::$PhpTypeMap[(string)$type];
+		return self::$PhpTypeMap[$typeName];
 	}
 }
