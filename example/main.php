@@ -4,10 +4,16 @@ require_once(__DIR__ . "/../vendor/autoload.php");
 
 use SohaJin\Toys\XmlDatabase\Expression\Expr;
 use SohaJin\Toys\XmlDatabase\Store\FileStore;
+use SohaJin\Toys\XmlDatabase\Store\RedisStore;
 use SohaJin\Toys\XmlDatabase\XmlDatabase;
 use SohaJin\Course202001\XmlDatabaseProgram\Entity\Task;
 
-$db = (new XmlDatabase('todo', new FileStore(__DIR__.'/var/', 't_')))
+$store = in_array('-redis', $argv)
+	? new RedisStore(keyPrefix: 't:')
+	: new FileStore(__DIR__.'/var/', 't_');
+echo 'XmlStore is '.$store::class.PHP_EOL;
+
+$db = (new XmlDatabase('todo', $store))
 	->addEntityClass(Task::class);
 
 echo "--find by primary key--".PHP_EOL;
