@@ -1,0 +1,25 @@
+{
+	"name": "sohajin/xmldatabase",
+	"description": "Database implemented with XML, a toy for a course's homework.",
+	"minimum-stability": "stable",
+	"license": "proprietary",
+	"authors": [{
+		"name": "soha",
+		"email": "soha@lohu.info"
+	}],
+	"require": {
+        "php": ">=8.0",
+		"ext-dom": "*",
+		"ext-libxml": "*"
+	},
+	"autoload": {
+		"psr-4": {
+			"SohaJin\\Toys\\XmlDatabase\\": "XmlDatabase/"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"SohaJin\\Course202001\\XmlDatabaseProgram\\": "example/"
+		}
+	}
+}
