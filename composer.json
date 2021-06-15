@@ -2,7 +2,7 @@
 	"name": "sohajin/xmldatabase",
 	"description": "Database implemented with XML, a toy for a course's homework.",
 	"minimum-stability": "stable",
-	"license": "proprietary",
+	"license": "MIT",
 	"authors": [{
 		"name": "soha",
 		"email": "soha@lohu.info"

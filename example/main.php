@@ -1,6 +1,6 @@
 <?php
 
-require_once(__DIR__ . "/../vendor/autoload.php");
+require_once(__DIR__."/../vendor/autoload.php");
 
 use SohaJin\Toys\XmlDatabase\Expression\Expr;
 use SohaJin\Toys\XmlDatabase\Store\FileStore;
@@ -16,7 +16,10 @@ echo 'XmlStore is '.$store::class.PHP_EOL;
 $db = (new XmlDatabase('todo', $store))
 	->addEntityClass(Task::class);
 
-echo "--find by primary key--".PHP_EOL;
+echo PHP_EOL."--XSD--".PHP_EOL;
+echo ($db->getEntityDocument(Task::class)->generateXmlSchema()).PHP_EOL;
+
+echo PHP_EOL."--find by primary key--".PHP_EOL;
 var_dump(
 	$db->getEntityManager()
 		->createQueryBuilder(Task::class)
@@ -34,7 +37,7 @@ $db->getEntityManager()->update((new Task(6))->setName('text 6!'));
 $db->getEntityManager()->update($test);
 $db->getEntityManager()->persist();
 
-echo "--find by primary key--".PHP_EOL;
+echo PHP_EOL."--find by primary key--".PHP_EOL;
 var_dump(
 	$db->getEntityManager()
 		->createQueryBuilder(Task::class)
@@ -42,13 +45,13 @@ var_dump(
 		->getSingleResult()
 );
 
+echo PHP_EOL."--find by conditions--".PHP_EOL;
 $qb = $db->getEntityManager()->createQueryBuilder(Task::class);
 $qb->orWhere(Expr::le($qb->fieldOp('id'), 2))
 	->orWhere(Expr::gt($qb->fieldOp('id'), 4))
 	->andWhere(Expr::contains($qb->fieldOp('name'), 'test'))
 ;
-echo "--find by conditions--".PHP_EOL;
-var_dump($qb->getXPath());
+echo "Generated XPath: ".$qb->getXPath().PHP_EOL;
 echo "[ID]\t[Name]".PHP_EOL;
 foreach($qb->getResult() as $item) {
 	/** @var $item Task */
