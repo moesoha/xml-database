@@ -76,7 +76,16 @@ class QueryBuilder {
 		if (!$this->entityManager) {
 			throw new \RuntimeException('EntityManager is not ready on this QueryBuilder.');
 		}
-		return $this->entityManager->query($this->reflection->getClass()->getName(), $this->getXPath());
+		if (count($this->orSegments) < 1) $this->orSegments[] = '';
+		return $this->entityManager->queryThenCollect($this->reflection->getClass()->getName(), $this->getXPath());
+	}
+
+	public function getCount(): int {
+		if (!$this->entityManager) {
+			throw new \RuntimeException('EntityManager is not ready on this QueryBuilder.');
+		}
+		if (count($this->orSegments) < 1) $this->orSegments[] = '';
+		return $this->entityManager->query($this->reflection->getClass()->getName(), $this->getXPath())->count();
 	}
 
 	public function getSingleResult(): ?object {

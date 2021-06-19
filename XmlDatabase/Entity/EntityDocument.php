@@ -7,6 +7,7 @@ use \DOMDocument, \DOMElement, \DOMNodeList, \DOMXPath;
 use SohaJin\Toys\XmlDatabase\Attribute\AutoIncrement;
 use SohaJin\Toys\XmlDatabase\QueryBuilder;
 use SohaJin\Toys\XmlDatabase\XmlSchemaDefinition\DataType;
+use function SohaJin\Toys\XmlDatabase\libxmlCallWrapper;
 use function SohaJin\Toys\XmlDatabase\phpClassNameToXmlElementName;
 
 class EntityDocument {
@@ -219,15 +220,7 @@ class EntityDocument {
 	}
 
 	public function validateXmlDocument(DOMDocument $dom): bool {
-		libxml_use_internal_errors(true);
-		libxml_clear_errors();
-		$result = $dom->schemaValidateSource($this->generateXmlSchema());
-		$errors = libxml_get_errors();
-		libxml_clear_errors();
-		if(count($errors) > 0) {
-			throw new \RuntimeException(implode("\n", array_map(fn($e) => $e->message, $errors)));
-		}
-		return $result;
+		return libxmlCallWrapper(fn() => $dom->schemaValidateSource($this->generateXmlSchema()));
 	}
 
 	public function isEntityEqual(object $a, object $b) {

@@ -2,9 +2,10 @@
 
 namespace SohaJin\Toys\XmlDatabase\Entity;
 
-use \DOMXPath;
+use \DOMXPath, \DOMNodeList;
 use SohaJin\Toys\XmlDatabase\QueryBuilder;
 use SohaJin\Toys\XmlDatabase\XmlDatabase;
+use function SohaJin\Toys\XmlDatabase\libxmlCallWrapper;
 
 class EntityManager {
 	private XmlDatabase $database;
@@ -89,14 +90,14 @@ class EntityManager {
 		$this->autoIncrementOverride = [];
 	}
 
-	public function query(string $className, string $xpath) {
-		$document = $this->assertClassName($className);
+	public function query(string $className, string $xpath): DOMNodeList {
+		$this->assertClassName($className);
 		$dom = $this->database->loadXmlDocument($className);
-		$nodes = (new DOMXPath($dom))->query($xpath);
-		if (!$nodes || $nodes->count() < 1) {
-			return [];
-		}
-		return $document->parseXmlNodeList($nodes);
+		return libxmlCallWrapper(fn() => (new DOMXPath($dom))->query($xpath));
+	}
+
+	public function queryThenCollect(string $className, string $xpath) {
+		return $this->assertClassName($className)->parseXmlNodeList($this->query($className, $xpath));
 	}
 
 	public function createQueryBuilder(string $className) {

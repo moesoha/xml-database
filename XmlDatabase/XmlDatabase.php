@@ -55,14 +55,7 @@ class XmlDatabase {
 		}
 		if (!empty($s = $this->storeGetContent(phpClassNameToXmlElementName($name), StoreType::XML))) {
 			$dom = new DOMDocument();
-			libxml_use_internal_errors(true);
-			libxml_clear_errors();
-			$result = $dom->loadXML($s);
-			$errors = libxml_get_errors();
-			libxml_clear_errors();
-			if (!$result) {
-				throw new \RuntimeException(implode("\n", array_map(fn($e) => $e->message, $errors)) ?: 'XML document load failed.');
-			}
+			libxmlCallWrapper(fn() => $dom->loadXML($s));
 		} else {
 			$dom = $document->generateXmlDocument([]);
 		}
