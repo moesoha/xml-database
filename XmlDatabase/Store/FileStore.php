@@ -23,8 +23,10 @@ class FileStore implements StoreInterface {
 		}
 		$fp = fopen($filename, 'r');
 		if(!flock($fp, LOCK_SH)) {
+			fclose($fp);
 			throw new AcquiringLockException();
 		}
+		clearstatcache(true, $filename);
 		$data = fread($fp, filesize($filename));
 		flock($fp, LOCK_UN);
 		fclose($fp);
@@ -37,6 +39,7 @@ class FileStore implements StoreInterface {
 	public function setContent(string $name, string $data) {
 		$fp = fopen($this->getFullPath($name), 'w');
 		if(!flock($fp, LOCK_EX)) {
+			fclose($fp);
 			throw new AcquiringLockException();
 		}
 		$result = fwrite($fp, $data);
