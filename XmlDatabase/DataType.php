@@ -1,9 +1,9 @@
 <?php
 
-namespace SohaJin\Toys\XmlDatabase\XmlSchemaDefinition;
+namespace SohaJin\Toys\XmlDatabase;
 
-use SohaJin\Toys\XmlDatabase\XmlSchemaDefinition\DataTransformer\BooleanTransformer;
-use SohaJin\Toys\XmlDatabase\XmlSchemaDefinition\DataTransformer\TransformerInterface;
+use SohaJin\Toys\XmlDatabase\TypeTransformer\BooleanTransformer;
+use SohaJin\Toys\XmlDatabase\TypeTransformer\TransformerInterface;
 
 // FIXME: many shits here, it just works now
 class DataType {

@@ -6,7 +6,7 @@ namespace SohaJin\Toys\XmlDatabase\Entity;
 use \DOMDocument, \DOMElement, \DOMNodeList, \DOMXPath;
 use SohaJin\Toys\XmlDatabase\Attribute\AutoIncrement;
 use SohaJin\Toys\XmlDatabase\QueryBuilder;
-use SohaJin\Toys\XmlDatabase\XmlSchemaDefinition\DataType;
+use SohaJin\Toys\XmlDatabase\DataType;
 use function SohaJin\Toys\XmlDatabase\libxmlCallWrapper;
 use function SohaJin\Toys\XmlDatabase\phpClassNameToXmlElementName;
 

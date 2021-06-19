@@ -1,7 +1,7 @@
 <?php
 
 
-namespace SohaJin\Toys\XmlDatabase\XmlSchemaDefinition\DataTransformer;
+namespace SohaJin\Toys\XmlDatabase\TypeTransformer;
 
 
 class BooleanTransformer implements TransformerInterface {
