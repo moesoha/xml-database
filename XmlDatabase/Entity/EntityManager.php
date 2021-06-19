@@ -70,6 +70,8 @@ class EntityManager {
 			foreach($list['delete'] as $entity) $document->deleteDataRow($entity, $dom);
 			$this->database->saveXmlDocument($className, $dom);
 		}
+		$this->updateBuffer = [];
+		$this->deleteBuffer = [];
 	}
 
 	public function query(string $className, string $xpath) {

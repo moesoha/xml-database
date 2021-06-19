@@ -28,16 +28,22 @@ class EntityReflection {
 	}
 
 	public function hasField(string $name): bool {
+		return $this->getField($name) !== null;
+	}
+
+	public function getField(string $name): ?ReflectionProperty {
 		try {
 			$property = $this->class->getProperty($name);
-			return $property->isPrivate() || $property->isPublic();
-		} catch (ReflectionException) {
-			return false;
-		}
+			if (
+				($property->isPrivate() || $property->isPublic()) &&
+				count($property->getAttributes(NotMapped::class)) < 1
+			) return $property;
+		} catch (ReflectionException) {}
+		return null;
 	}
 
 	/**
-	 * @return array<int, ReflectionProperty>
+	 * @return ReflectionProperty[]
 	 */
 	public function getPrimaryKeyFields(): array {
 		$fields = $this->getFields();
@@ -64,6 +70,9 @@ class EntityReflection {
 		}
 		$property = $this->class->getProperty($field);
 		$property->setAccessible(true);
+		if (!$property->isInitialized($a) || !$property->isInitialized($b)) {
+			return false;
+		}
 		return $property->getValue($a) === $property->getValue($b);
 	}
 

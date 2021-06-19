@@ -33,7 +33,7 @@ class EntityDocument {
 	}
 
 	public function getPrimaryKeyValues(object $o): array {
-		return array_map(fn($f) => $f->getValue($o), $this->reflection->getPrimaryKeyFields());
+		return array_map(fn($f) => $f->isInitialized($o) ? $f->getValue($o) : null, $this->reflection->getPrimaryKeyFields());
 	}
 
 	public function generateXmlSchema(): string {
@@ -87,11 +87,14 @@ class EntityDocument {
 	}
 
 	public function replaceOrInsertDataRow(object $object, DOMDocument $dom) {
-		$xpath = (new QueryBuilder($object::class))->findByPrimaryKey(...$this->getPrimaryKeyValues($object))->getXPath();
-		$nodeList = (new DOMXPath($dom))->query($xpath);
-		if ($nodeList && $nodeList->count() > 0) {
-			$nodes = iterator_to_array($nodeList);
-			foreach($nodes as $node) $node->parentNode->removeChild($node);
+		$pkValues = $this->getPrimaryKeyValues($object);
+		if (!in_array(null, $pkValues)) { // null primary key means not initialized, skip
+			$xpath = (new QueryBuilder($object::class))->findByPrimaryKey(...$pkValues)->getXPath();
+			$nodeList = (new DOMXPath($dom))->query($xpath);
+			if ($nodeList && $nodeList->count() > 0) {
+				$nodes = iterator_to_array($nodeList);
+				foreach($nodes as $node) $node->parentNode->removeChild($node);
+			}
 		}
 		$dom->getElementsByTagName(Helpers::convertPhpQualifiedNameToXmlElementName(self::class))
 			->item(0)
@@ -102,7 +105,7 @@ class EntityDocument {
 		$xpath = (new QueryBuilder($object::class))->findByPrimaryKey(...$this->getPrimaryKeyValues($object))->getXPath();
 		$nodeList = (new DOMXPath($dom))->query($xpath);
 		if ($nodeList && $nodeList->count() > 0) {
-			foreach($nodeList as $node) $dom->removeChild($node);
+			foreach($nodeList as $node) $node->parentNode->removeChild($node);
 		}
 	}
 
