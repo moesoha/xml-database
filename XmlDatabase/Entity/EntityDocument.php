@@ -85,7 +85,7 @@ class EntityDocument {
 		foreach($this->reflection->getFields() as $property) {
 			$root->appendChild($o = $dom->createElement('xs:element'));
 			$o->setAttribute('name', $property->getName());
-			$o->setAttribute('type', DataType::convertFromPhpType($property->getType()));
+			$o->setAttribute('type', DataType::getXmlType($property->getType()));
 			if (substr((string)$property->getType(), 0, 1) === '?') {
 				$o->setAttribute('minOccurs', 0);
 			}
@@ -110,7 +110,8 @@ class EntityDocument {
 			if (!$property->isInitialized($object)) {
 				continue;
 			}
-			$el->appendChild($dom->createElement($property->getName(), $property->getValue($object)));
+			$value = DataType::toXmlValue($property->getValue($object));
+			$el->appendChild($dom->createElement($property->getName(), $value));
 		}
 		return $el;
 	}
@@ -186,7 +187,7 @@ class EntityDocument {
 				$value = null;
 				if ($elCount === 1) {
 					$value = $e->item(0)->nodeValue;
-					settype($value, ltrim($type, '?'));
+					$value = DataType::toPhpValue(DataType::getXmlType($property->getType()), $value);
 				}
 				$property->setValue($object, $value);
 			}
