@@ -65,7 +65,7 @@ class EntityDocument {
 		$root->appendChild($root = $dom->createElement('xs:complexType'));
 		$root->appendChild($o = $dom->createElement('xs:attribute'));
 		$o->setAttribute('name', 'entity');
-		$o->setAttribute('type', 'xs:string');
+		$o->setAttribute('type', 'xs:NCName');
 		$root->appendChild($o = $dom->createElement('xs:attribute'));
 		$o->setAttribute('name', 'field');
 		$o->setAttribute('type', 'xs:string');
@@ -90,7 +90,7 @@ class EntityDocument {
 			}
 		}
 		// primary key
-		$docRoot->appendChild($root = $dom->createElement('xs:unique'));
+		$docRoot->appendChild($root = $dom->createElement('xs:key'));
 		$root->setAttribute('name', 'PrimaryKey');
 		$root->appendChild($o = $dom->createElement('xs:selector'));
 		$o->setAttribute('xpath', $entityXmlTag);
@@ -129,9 +129,7 @@ class EntityDocument {
 			if ($field->isInitialized($object)) continue;
 			$field->setValue($object, $this->nextAutoIncrementValue($field->getName(), $dom));
 		}
-		$dom->getElementsByTagName(phpClassNameToXmlElementName(self::class))
-			->item(0)
-			->appendChild($this->generateXmlElement($object, $dom));
+		$dom->firstElementChild->appendChild($this->generateXmlElement($object, $dom));
 	}
 
 	public function nextAutoIncrementValue(string $fieldName, DOMDocument $dom, int $valueOverride = 0): int {
@@ -139,7 +137,7 @@ class EntityDocument {
 			return 0;
 		}
 		$xpath =
-			'/'.phpClassNameToXmlElementName(EntityDocument::class).
+			'/'.phpClassNameToXmlElementName(self::class).
 			'/'.phpClassNameToXmlElementName(AutoIncrement::class).
 			'[@entity="'.phpClassNameToXmlElementName($this->getClassName()).'"]'.
 			'[@field="'.$fieldName.'"]'.
