@@ -3,6 +3,7 @@
 namespace SohaJin\Toys\XmlDatabase\Entity;
 
 use \ReflectionClass, \ReflectionProperty, \ReflectionException;
+use SohaJin\Toys\XmlDatabase\Attribute\AutoIncrement;
 use SohaJin\Toys\XmlDatabase\Attribute\Entity;
 use SohaJin\Toys\XmlDatabase\Attribute\NotMapped;
 use SohaJin\Toys\XmlDatabase\Attribute\PrimaryKey;
@@ -54,6 +55,16 @@ class EntityReflection {
 		if (count($pkField) < 1) {
 			throw new \RuntimeException('Entity '.$this->getClass()->getName().' doesn\'t have any primary key field.');
 		}
+		array_map(fn($f) => $f->setAccessible(true), $pkField);
+		return $pkField;
+	}
+
+	/**
+	 * @return ReflectionProperty[]
+	 */
+	public function getAutoIncrementFields(): array {
+		$fields = $this->getFields();
+		$pkField = array_filter($fields, fn($f) => count($f->getAttributes(AutoIncrement::class)) > 0);
 		array_map(fn($f) => $f->setAccessible(true), $pkField);
 		return $pkField;
 	}

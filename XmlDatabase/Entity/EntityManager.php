@@ -19,6 +19,11 @@ class EntityManager {
 	 */
 	private array $deleteBuffer = [];
 
+	/**
+	 * @var array<string, array<string, int>>
+	 */
+	private array $autoIncrementOverride = [];
+
 	public function __construct(XmlDatabase $database) {
 		$this->database = $database;
 	}
@@ -26,6 +31,9 @@ class EntityManager {
 	private function assertClassName(string $className): EntityDocument {
 		if (!($d = $this->database->getEntityDocument($className))) {
 			throw new \InvalidArgumentException("$className is not registered as an entity.");
+		}
+		if (!isset($this->autoIncrementOverride[$className])) {
+			$this->autoIncrementOverride[$className] = [];
 		}
 		return $d;
 	}
@@ -43,6 +51,11 @@ class EntityManager {
 		$this->removeFromBuffer($entity, $this->updateBuffer);
 		$this->updateBuffer[] = $entity;
 		$this->removeFromBuffer($entity, $this->deleteBuffer);
+	}
+
+	public function setAutoIncrementValue(string $class, string $field, int $value) {
+		$document = $this->assertClassName($class);
+		$this->autoIncrementOverride[$class][$field] = $value;
 	}
 
 	public function persist() {
@@ -66,12 +79,14 @@ class EntityManager {
 		foreach($pendingEntitiesByClass as $className => $list) {
 			$dom = $this->database->loadXmlDocument($className);
 			$document = $this->database->getEntityDocument($className);
+			foreach(($this->autoIncrementOverride[$className] ?? []) as $field => $value) $document->nextAutoIncrementValue($field, $dom, $value);
 			foreach($list['update'] as $entity) $document->replaceOrInsertDataRow($entity, $dom);
 			foreach($list['delete'] as $entity) $document->deleteDataRow($entity, $dom);
 			$this->database->saveXmlDocument($className, $dom);
 		}
 		$this->updateBuffer = [];
 		$this->deleteBuffer = [];
+		$this->autoIncrementOverride = [];
 	}
 
 	public function query(string $className, string $xpath) {

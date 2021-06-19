@@ -22,8 +22,8 @@ class QueryBuilder {
 	public function __construct(string $className) {
 		$this->reflection = new EntityReflection($className);
 		$this->rootXPath =
-			'/'.Helpers::convertPhpQualifiedNameToXmlElementName(EntityDocument::class).
-			'/'.Helpers::convertPhpQualifiedNameToXmlElementName($className)
+			'/'.phpClassNameToXmlElementName(EntityDocument::class).
+			'/'.phpClassNameToXmlElementName($className)
 		;
 	}
 

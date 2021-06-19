@@ -28,13 +28,20 @@ var_dump(
 );
 
 $test = (new Task(114514))->setName('current time')->setTime(time());
-$db->getEntityManager()->update((new Task(1))->setName('test 1!'));
-$db->getEntityManager()->update((new Task(2))->setName('test 2!'));
-$db->getEntityManager()->update((new Task(3))->setName('test 3!'));
-$db->getEntityManager()->update((new Task(4))->setName('test 4!'));
-$db->getEntityManager()->update((new Task(5))->setName('test 5!'));
-$db->getEntityManager()->update((new Task(6))->setName('text 6!'));
+$db->getEntityManager()->update((new Task())->setName('test 1!'));
+$db->getEntityManager()->update((new Task())->setName('test 2!'));
+$db->getEntityManager()->update((new Task())->setName('test 3!'));
+$db->getEntityManager()->update((new Task())->setName('test 4!'));
+$db->getEntityManager()->update((new Task())->setName('test 5!'));
+$db->getEntityManager()->update($test6 = (new Task())->setName('text 6!'));
 $db->getEntityManager()->update($test);
+$db->getEntityManager()->persist();
+
+$db->getEntityManager()->delete($test6);
+$db->getEntityManager()->update((new Task())->setName('test 7!'));
+$db->getEntityManager()->update((new Task())->setName('test 8!'));
+$db->getEntityManager()->update((new Task())->setName('test 9!'));
+$db->getEntityManager()->update((new Task())->setName('test 10!'));
 $db->getEntityManager()->persist();
 
 echo PHP_EOL."--find by primary key--".PHP_EOL;

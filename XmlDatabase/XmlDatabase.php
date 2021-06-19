@@ -2,6 +2,8 @@
 
 namespace SohaJin\Toys\XmlDatabase;
 
+include_once 'functions.php';
+
 use \DOMDocument;
 use SohaJin\Toys\XmlDatabase\Entity\EntityDocument;
 use SohaJin\Toys\XmlDatabase\Entity\EntityManager;
@@ -51,9 +53,16 @@ class XmlDatabase {
 		if (!($document = $this->getEntityDocument($name))) {
 			throw new \InvalidArgumentException("$name is not registered as an entity.");
 		}
-		if (!empty($s = $this->storeGetContent(Helpers::convertPhpQualifiedNameToXmlElementName($name), StoreType::XML))) {
+		if (!empty($s = $this->storeGetContent(phpClassNameToXmlElementName($name), StoreType::XML))) {
 			$dom = new DOMDocument();
-			$dom->loadXML($s);
+			libxml_use_internal_errors(true);
+			libxml_clear_errors();
+			$result = $dom->loadXML($s);
+			$errors = libxml_get_errors();
+			libxml_clear_errors();
+			if (!$result) {
+				throw new \RuntimeException(implode("\n", array_map(fn($e) => $e->message, $errors)) ?: 'XML document load failed.');
+			}
 		} else {
 			$dom = $document->generateXmlDocument([]);
 		}
@@ -66,6 +75,7 @@ class XmlDatabase {
 			throw new \InvalidArgumentException("$name is not registered as an entity.");
 		}
 		$document->validateXmlDocument($dom);
-		$this->storeSetContent(Helpers::convertPhpQualifiedNameToXmlElementName($name), StoreType::XML, $dom->saveXML());
+		$this->storeSetContent(phpClassNameToXmlElementName($name), StoreType::XML, $dom->saveXML());
+		$this->storeSetContent(phpClassNameToXmlElementName($name), StoreType::XSD, $document->generateXmlSchema());
 	}
 }

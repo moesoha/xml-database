@@ -2,18 +2,21 @@
 
 namespace SohaJin\Course202001\XmlDatabaseProgram\Entity;
 
+use SohaJin\Toys\XmlDatabase\Attribute\AutoIncrement;
 use SohaJin\Toys\XmlDatabase\Attribute\Entity;
 use SohaJin\Toys\XmlDatabase\Attribute\NotMapped;
 use SohaJin\Toys\XmlDatabase\Attribute\PrimaryKey;
 
 #[Entity] class Task {
-	#[PrimaryKey] private int $id;
+	#[PrimaryKey, AutoIncrement] private int $id;
 	private string $name;
 	private ?int $time;
 	#[NotMapped] private string $unmapped = 'yay!';
 
-	public function __construct(int $id) {
-		$this->id = $id;
+	public function __construct(?int $id = null) {
+		if (is_numeric($id)) {
+			$this->id = $id;
+		}
 	}
 
 	public function getId(): int {
