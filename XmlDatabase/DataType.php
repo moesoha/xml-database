@@ -28,8 +28,9 @@ class DataType {
 		return self::$PhpTypeMap[$typeName];
 	}
 
-	public static function toXmlValue($value): string {
+	public static function toXmlValue($value): ?string {
 		$type = gettype($value);
+		if ($type === 'NULL') return null;
 		if ($type === 'integer') $type = 'int';
 		if ($type === 'boolean') $type = 'bool';
 		if ($type === 'object') $type = $value::class;

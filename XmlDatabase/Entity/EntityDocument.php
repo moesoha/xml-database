@@ -110,8 +110,9 @@ class EntityDocument {
 			if (!$property->isInitialized($object)) {
 				continue;
 			}
-			$value = DataType::toXmlValue($property->getValue($object));
-			$el->appendChild($dom->createElement($property->getName(), $value));
+			if (($value = DataType::toXmlValue($property->getValue($object))) !== null) {
+				$el->appendChild($dom->createElement($property->getName(), $value));
+			}
 		}
 		return $el;
 	}
